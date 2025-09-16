@@ -1,200 +1,212 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import Auth from "../Components/Auth.jsx";
-import Forground from "../Components/Forground.jsx";
 
-function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [networkError, setNetworkError] = useState(false);
+const Auth = ({ onLoginSuccess }) => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // Configure axios defaults for better mobile support
-  useEffect(() => {
-    axios.defaults.timeout = 15000; // 15 second timeout
-    axios.defaults.withCredentials = true;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
     
-    // Add request interceptor for debugging
-    const requestInterceptor = axios.interceptors.request.use(
-      (config) => {
-        console.log("Making request to:", config.url);
-        console.log("With credentials:", config.withCredentials);
-        return config;
-      },
-      (error) => {
-        console.error("Request error:", error);
-        return Promise.reject(error);
-      }
-    );
-
-    // Add response interceptor for debugging
-    const responseInterceptor = axios.interceptors.response.use(
-      (response) => {
-        console.log("Response received:", response.status);
-        return response;
-      },
-      (error) => {
-        console.error("Response error:", error);
-        return Promise.reject(error);
-      }
-    );
-
-    // Cleanup interceptors
-    return () => {
-      axios.interceptors.request.eject(requestInterceptor);
-      axios.interceptors.response.eject(responseInterceptor);
-    };
-  }, []);
-
-  // Network status monitoring
-  useEffect(() => {
-    const handleOnline = () => {
-      console.log("Device is online");
-      setNetworkError(false);
-      if (!user) {
-        checkAuth();
-      }
-    };
-
-    const handleOffline = () => {
-      console.log("Device is offline");
-      setNetworkError(true);
-    };
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, [user]);
-
-  const checkAuth = useCallback(async () => {
-    setLoading(true);
-    setNetworkError(false);
-    console.log("checkAuth: Starting authentication check");
-    console.log("Current cookies:", document.cookie);
-    console.log("Navigator online:", navigator.onLine);
-
+    console.log("Auth: Starting authentication process");
+    console.log("Auth: Login mode:", isLogin);
+    
     try {
-      const res = await axios.get("https://chatify-backend-eight.vercel.app/me", {
+      const url = isLogin
+        ? "https://chatify-backend-eight.vercel.app/login"
+        : "https://chatify-backend-eight.vercel.app/register";
+
+      const payload = isLogin
+        ? { username, password }
+        : { username, email, password };
+
+      console.log("Auth: Making request to:", url);
+      console.log("Auth: With payload:", { ...payload, password: "[HIDDEN]" });
+
+      const res = await axios.post(url, payload, {
         withCredentials: true,
         headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
+          'Content-Type': 'application/json',
         }
       });
-
-      console.log("checkAuth: Success - Status:", res.status);
-      console.log("checkAuth: Response data:", res.data);
-
-      if (res.data && res.data.user) {
-        setUser(res.data.user);
-        console.log("checkAuth: User authenticated successfully");
+      
+      console.log("Auth: Response status:", res.status);
+      console.log("Auth: Response data:", res.data);
+      
+      if (res.status === 200 || res.status === 201) {
+        console.log("Auth: Authentication successful, calling onLoginSuccess");
+        
+        // Clear form on success
+        setUsername("");
+        setPassword("");
+        setEmail("");
+        
+        // Important: Call onLoginSuccess with NO parameters
+        onLoginSuccess();
       } else {
-        console.log("checkAuth: No user data in response");
-        setUser(null);
+        throw new Error(`Unexpected status code: ${res.status}`);
       }
     } catch (err) {
-      console.error("checkAuth: Failed with error:", err);
+      console.error("Auth: Authentication failed:", err);
       
-      // Detailed error logging for mobile debugging
+      let errorMessage = "Authentication failed";
+      
       if (err.response) {
-        console.error("Response error - Status:", err.response.status);
-        console.error("Response error - Data:", err.response.data);
-        console.error("Response error - Headers:", err.response.headers);
+        console.error("Auth: Server responded with:", err.response.status, err.response.data);
+        errorMessage = err.response.data?.message || err.response.data?.error || errorMessage;
       } else if (err.request) {
-        console.error("Request error - No response received:", err.request);
-        setNetworkError(true);
+        console.error("Auth: No response received:", err.request);
+        errorMessage = "Network error - please check your connection";
       } else {
-        console.error("Setup error:", err.message);
+        console.error("Auth: Request setup error:", err.message);
+        errorMessage = err.message;
       }
-
-      // Check for specific mobile issues
-      if (err.code === 'NETWORK_ERROR' || 
-          err.message.includes('timeout') || 
-          err.message.includes('Network Error')) {
-        console.log("Detected network connectivity issue");
-        setNetworkError(true);
-      }
-
-      setUser(null);
+      
+      setError(errorMessage);
     } finally {
-      setLoading(false);
-      console.log("checkAuth: Authentication check completed");
+      setIsLoading(false);
     }
-  }, []);
-
-  // Initial auth check
-  useEffect(() => {
-    // Add small delay for mobile to ensure DOM is ready
-    const timer = setTimeout(() => {
-      checkAuth();
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [checkAuth]);
-
-  // Handle page visibility changes (important for mobile)
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!document.hidden && !user && !loading) {
-        console.log("Page became visible, rechecking auth");
-        checkAuth();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [user, loading, checkAuth]);
-
-  // Loading state with network error handling
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-center">
-          <div className="text-white text-lg mb-2">Checking authentication...</div>
-          {networkError && (
-            <div className="text-yellow-400 text-sm">
-              Network connectivity issue detected
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // Network error state
-  if (networkError && !user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-center p-4">
-          <div className="text-red-400 text-lg mb-4">Connection Error</div>
-          <div className="text-gray-300 mb-4">
-            Unable to connect to the server. Please check your internet connection.
-          </div>
-          <button
-            onClick={checkAuth}
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
+  };
 
   return (
-    <div className="min-h-screen">
-      {user ? (
-        <Forground user={user} onLogout={checkAuth} />
-      ) : (
-        <Auth onLoginSuccess={checkAuth} />
-      )}
+    <div className="min-h-screen flex items-center justify-center bg-black p-4">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-gray-800 rounded-full opacity-5 blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-gray-700 rounded-full opacity-5 blur-3xl animate-pulse delay-1000"></div>
+      </div>
+
+      <div className="relative w-full max-w-md">
+        {/* Glass morphism card */}
+        <div className="backdrop-blur-xl bg-gray-900/90 border border-gray-700 rounded-3xl shadow-2xl p-8 relative overflow-hidden">
+          {/* Glowing border effect */}
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-gray-600 via-gray-500 to-gray-600 opacity-10 blur-sm"></div>
+          
+          <div className="relative z-10">
+            {/* Logo/Header area */}
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg border border-gray-600">
+                <div className="w-8 h-8 bg-white rounded-lg opacity-90"></div>
+              </div>
+              <h1 className="text-3xl font-bold text-white mb-2">
+                {isLogin ? "Welcome Back" : "Create Account"}
+              </h1>
+              <p className="text-gray-400 text-sm">
+                {isLogin 
+                  ? "Sign in to your account to continue" 
+                  : "Join us today and get started"}
+              </p>
+            </div>
+
+            {/* Error message */}
+            {error && (
+              <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-sm">
+                {error}
+              </div>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Username field */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Username"
+                  className="w-full px-4 py-3 bg-gray-800/80 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 backdrop-blur-sm transition-all duration-300"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-gray-700/20 to-gray-600/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              </div>
+
+              {/* Email field (only for register) */}
+              <div className={`relative transition-all duration-500 ${!isLogin ? 'opacity-100 max-h-20' : 'opacity-0 max-h-0 overflow-hidden'}`}>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  className="w-full px-4 py-3 bg-gray-800/80 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 backdrop-blur-sm transition-all duration-300"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required={!isLogin}
+                  disabled={isLoading}
+                />
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-gray-700/20 to-gray-600/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              </div>
+
+              {/* Password field */}
+              <div className="relative">
+                <input
+                  type="password"
+                  placeholder="Password"
+                  className="w-full px-4 py-3 bg-gray-800/80 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 backdrop-blur-sm transition-all duration-300"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-gray-700/20 to-gray-600/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              </div>
+
+              {/* Submit button */}
+              <button 
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3 px-4 bg-white text-black font-semibold rounded-xl shadow-lg hover:bg-gray-100 transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                <div className="flex items-center justify-center space-x-2">
+                  {isLoading && (
+                    <div className="w-4 h-4 border-2 border-gray-300 border-t-black rounded-full animate-spin"></div>
+                  )}
+                  <span>
+                    {isLoading 
+                      ? (isLogin ? "Signing In..." : "Creating Account...") 
+                      : (isLogin ? "Sign In" : "Create Account")}
+                  </span>
+                </div>
+              </button>
+            </form>
+
+            {/* Toggle between login/register */}
+            <div className="mt-8 text-center">
+              <p className="text-gray-400 text-sm mb-2">
+                {isLogin ? "Don't have an account?" : "Already have an account?"}
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setError(""); // Clear error when switching modes
+                }}
+                disabled={isLoading}
+                className="text-white hover:text-gray-300 font-semibold transition-colors duration-300 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLogin ? "Create Account" : "Sign In"}
+              </button>
+            </div>
+
+            {/* Decorative elements */}
+            <div className="absolute -top-2 -right-2 w-20 h-20 bg-gradient-to-br from-gray-700 to-gray-800 rounded-full opacity-20 blur-2xl"></div>
+            <div className="absolute -bottom-2 -left-2 w-16 h-16 bg-gradient-to-br from-gray-600 to-gray-700 rounded-full opacity-20 blur-2xl"></div>
+          </div>
+        </div>
+
+        {/* Bottom decorative text */}
+        <div className="text-center mt-8">
+          <p className="text-gray-600 text-xs">
+            Secure • Fast • Beautiful
+          </p>
+        </div>
+      </div>
     </div>
   );
-}
+};
 
-export default App;
+export default Auth;
