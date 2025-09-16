@@ -7,10 +7,15 @@ const Auth = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
+    
+    console.log("Auth: Starting authentication process");
+    console.log("Auth: Login mode:", isLogin);
     
     try {
       const url = isLogin
@@ -21,16 +26,49 @@ const Auth = ({ onLoginSuccess }) => {
         ? { username, password }
         : { username, email, password };
 
+      console.log("Auth: Making request to:", url);
+      console.log("Auth: With payload:", { ...payload, password: "[HIDDEN]" });
+
       const res = await axios.post(url, payload, {
-        withCredentials: true, // important for cookies
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        }
       });
       
-      const data = res.data;
-      console.log(data);
-      onLoginSuccess(data); // pass login success back
+      console.log("Auth: Response status:", res.status);
+      console.log("Auth: Response data:", res.data);
+      
+      if (res.status === 200 || res.status === 201) {
+        console.log("Auth: Authentication successful, calling onLoginSuccess");
+        
+        // Clear form on success
+        setUsername("");
+        setPassword("");
+        setEmail("");
+        
+        // Important: Call onLoginSuccess with NO parameters
+        onLoginSuccess();
+      } else {
+        throw new Error(`Unexpected status code: ${res.status}`);
+      }
     } catch (err) {
-      console.error(err.message);
-      alert("Auth failed");
+      console.error("Auth: Authentication failed:", err);
+      
+      let errorMessage = "Authentication failed";
+      
+      if (err.response) {
+        console.error("Auth: Server responded with:", err.response.status, err.response.data);
+        errorMessage = err.response.data?.message || err.response.data?.error || errorMessage;
+      } else if (err.request) {
+        console.error("Auth: No response received:", err.request);
+        errorMessage = "Network error - please check your connection";
+      } else {
+        console.error("Auth: Request setup error:", err.message);
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -66,6 +104,13 @@ const Auth = ({ onLoginSuccess }) => {
               </p>
             </div>
 
+            {/* Error message */}
+            {error && (
+              <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-sm">
+                {error}
+              </div>
+            )}
+
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Username field */}
@@ -77,6 +122,7 @@ const Auth = ({ onLoginSuccess }) => {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-gray-700/20 to-gray-600/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               </div>
@@ -90,6 +136,7 @@ const Auth = ({ onLoginSuccess }) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required={!isLogin}
+                  disabled={isLoading}
                 />
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-gray-700/20 to-gray-600/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               </div>
@@ -103,6 +150,7 @@ const Auth = ({ onLoginSuccess }) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-gray-700/20 to-gray-600/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               </div>
@@ -117,7 +165,11 @@ const Auth = ({ onLoginSuccess }) => {
                   {isLoading && (
                     <div className="w-4 h-4 border-2 border-gray-300 border-t-black rounded-full animate-spin"></div>
                   )}
-                  <span>{isLogin ? "Sign In" : "Create Account"}</span>
+                  <span>
+                    {isLoading 
+                      ? (isLogin ? "Signing In..." : "Creating Account...") 
+                      : (isLogin ? "Sign In" : "Create Account")}
+                  </span>
                 </div>
               </button>
             </form>
@@ -129,8 +181,12 @@ const Auth = ({ onLoginSuccess }) => {
               </p>
               <button
                 type="button"
-                onClick={() => setIsLogin(!isLogin)}
-                className="text-white hover:text-gray-300 font-semibold transition-colors duration-300 hover:underline"
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setError(""); // Clear error when switching modes
+                }}
+                disabled={isLoading}
+                className="text-white hover:text-gray-300 font-semibold transition-colors duration-300 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLogin ? "Create Account" : "Sign In"}
               </button>
