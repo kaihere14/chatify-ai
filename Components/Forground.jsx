@@ -4,32 +4,45 @@ import { GoSidebarExpand, GoSidebarCollapse } from "react-icons/go";
 import { TfiWrite } from "react-icons/tfi";
 import { IoSend } from "react-icons/io5";
 import axios from 'axios';
-import { motion } from "framer-motion";
-import ReactMarkdown from "react-markdown";
 import { ThreeDot } from "react-loading-indicators";
+import ReactMarkdown from "react-markdown";
 
 const Forground = ({ user, onLogout }) => {
-  const [loading, setLoadin] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [input, setInput] = useState('');
   const [message, setMessage] = useState([]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Re-introduce state for sidebar visibility
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const bottomRef = useRef(null);
 
+  // Scroll to bottom whenever messages update
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [message]);
 
+  // Get token from localStorage
+  const token = localStorage.getItem("accessToken");
+
+  // Send user input to backend
   const handler = async (e) => {
     e.preventDefault();
+    if (!input.trim()) return;
+
     setMessage(prev => [...prev, { text: input, sender: "user" }]);
     const data = { input };
     setInput('');
-    setLoadin(true);
+    setLoading(true);
 
     try {
-      const response = await axios.post("https://chatify-backend-eight.vercel.app/asked", data, {
-        withCredentials: true, // send cookies
-      });
+      const response = await axios.post(
+        "https://chatify-backend-eight.vercel.app/asked",
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       setMessage(prev => [
         ...prev,
         { text: response.data.text, sender: response.data.sender || "bot" },
@@ -40,20 +53,26 @@ const Forground = ({ user, onLogout }) => {
         { text: "❌ Something went wrong. Please try again.", sender: "bot" },
       ]);
     } finally {
-      setLoadin(false);
+      setLoading(false);
     }
   };
-  
-  const logOut = async() =>{
+
+  // Logout function
+  const logOut = async () => {
     try {
-      const res = await axios.post("https://chatify-backend-eight.vercel.app/logout",{},{
-        withCredentials : true
-      })
-     onLogout()
+      await axios.post(
+        "https://chatify-backend-eight.vercel.app/logout",
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      onLogout();
+      localStorage.removeItem("accessToken");
     } catch (error) {
-      console.log(error )
+      console.error(error);
     }
-  }
+  };
 
   return (
     <div className='w-full min-h-[100vh] bg-[#4f4f4f] flex flex-col md:flex-row'>
@@ -68,13 +87,11 @@ const Forground = ({ user, onLogout }) => {
         </div>
 
         <div
-          onClick={()=>setMessage([])}
+          onClick={() => setMessage([])}
           className="nchat md:mt-10 py-3 w-full flex items-center justify-center cursor-pointer hover:bg-black/20"
         >
           <TfiWrite className="text-2xl text-white/30" />
-          <button className="text-xl ml-3 text-white/30 cursor-pointer">
-            New Chat
-          </button>
+          <button className="text-xl ml-3 text-white/30 cursor-pointer">New Chat</button>
         </div>
 
         <div
@@ -82,9 +99,7 @@ const Forground = ({ user, onLogout }) => {
           className="nchat md:mt-10 py-3 w-full flex items-center justify-center cursor-pointer hover:bg-black/20"
         >
           <TfiWrite className="text-2xl text-white/30" />
-          <button className="text-xl ml-3 text-white/30 cursor-pointer">
-            log out
-          </button>
+          <button className="text-xl ml-3 text-white/30 cursor-pointer">Log Out</button>
         </div>
       </div>
 
@@ -99,6 +114,7 @@ const Forground = ({ user, onLogout }) => {
             <GoSidebarExpand />
           </button>
         )}
+
         <div className="messages p-5 flex flex-col space-y-2">
           {message.map((msg, index) => (
             <div
@@ -106,7 +122,7 @@ const Forground = ({ user, onLogout }) => {
               className={`px-4 py-2 rounded-lg max-w-[60%] ${msg.sender === "user" ? "bg-blue-600 text-white self-end" : "bg-gray-700/40 text-white self-start"}`}
             >
               {msg.sender === "bot" ? (
-                <div className="text-white break-words space-y-10">
+                <div className="text-white break-words">
                   <ReactMarkdown>{msg.text.replace(/\n/g, "  \n")}</ReactMarkdown>
                 </div>
               ) : (
@@ -115,11 +131,11 @@ const Forground = ({ user, onLogout }) => {
             </div>
           ))}
 
-          {loading && 
+          {loading && (
             <div className='ml-3'>
               <ThreeDot color="#c3c3c3" size="small" text="" textColor="" />
             </div>
-          }
+          )}
         </div>
 
         <form onSubmit={handler} className='mt-20'>
