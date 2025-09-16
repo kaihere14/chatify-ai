@@ -12,6 +12,7 @@ function App() {
       console.log("Checking auth");
       const res = await axios.get("https://chatify-backend-eight.vercel.app/me", {
         withCredentials: true,
+        headers: { Authorization: `Bearer ${token}` }
       });
       setUser(res.data.user);
     } catch (err) {
