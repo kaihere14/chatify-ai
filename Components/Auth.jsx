@@ -33,7 +33,7 @@ const Auth = ({ onLoginSuccess }) => {
       alert("Authentication failed");
     } finally {
       setIsLoading(false);
-    }ß
+    }
   };
 
   return (
