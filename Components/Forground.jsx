@@ -26,7 +26,7 @@ const Forground = ({ user }) => {
     setLoadin(true);
 
     try {
-      const response = await axios.post("http://localhost:3000/asked", data, {
+      const response = await axios.post("https://chatify-backend-eight.vercel.app/asked", data, {
         withCredentials: true, // send cookies
       });
       setMessage(prev => [
@@ -45,7 +45,7 @@ const Forground = ({ user }) => {
   
   const logOut = async() =>{
     try {
-      const res = await axios.post("http://localhost:3000/logout",{},{
+      const res = await axios.post("https://chatify-backend-eight.vercel.app/logout",{},{
         withCredentials : true
       })
      user(false)

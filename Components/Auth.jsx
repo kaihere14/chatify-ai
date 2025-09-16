@@ -13,8 +13,8 @@ const Auth = ({ onLogin }) => {
     
     try {
       const url = isLogin
-        ? "http://localhost:3000/login"
-        : "http://localhost:3000/register";
+        ? "https://chatify-backend-eight.vercel.app/login"
+        : "https://chatify-backend-eight.vercel.app/register";
 
       const payload = isLogin
         ? { username, password }

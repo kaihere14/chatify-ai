@@ -10,7 +10,7 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/me", {
+        const res = await axios.get("https://chatify-backend-eight.vercel.app/me", {
           withCredentials: true, // send cookies
         });
         setUser(res.data.user); // user comes from backend
@@ -22,7 +22,7 @@ function App() {
     };
 
     checkAuth();
-  }, [user]);
+  }, [setUser]);
 
   if (loading) return <div className="text-white">Checking auth...</div>;
 
