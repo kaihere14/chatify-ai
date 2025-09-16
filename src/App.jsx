@@ -8,6 +8,7 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   const checkAuth = useCallback(async () => {
+    setLoading(true); // Ensure loading is true at the start of every auth check
     try {
       const res = await axios.get("https://chatify-backend-eight.vercel.app/me", {
         withCredentials: true, // send cookies

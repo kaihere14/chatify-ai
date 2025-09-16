@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const Auth = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState("");
@@ -20,21 +21,11 @@ const Auth = ({ onLoginSuccess }) => {
         ? { username, password }
         : { username, email, password };
 
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // important for cookies
-        body: JSON.stringify(payload),
+      const res = await axios.post(url, payload, {
+        withCredentials: true, // important for cookies
       });
       
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      
-      const data = await res.json();
-
+      const data = res.data;
       console.log(data);
       onLoginSuccess(data); // pass login success back
     } catch (err) {
