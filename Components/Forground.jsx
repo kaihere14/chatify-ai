@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { ThreeDot } from "react-loading-indicators";
 
-const Forground = ({ user }) => {
+const Forground = ({ user, onLogout }) => {
   const [loading, setLoadin] = useState(false);
   const [input, setInput] = useState('');
   const [message, setMessage] = useState([]);
@@ -48,7 +48,7 @@ const Forground = ({ user }) => {
       const res = await axios.post("https://chatify-backend-eight.vercel.app/logout",{},{
         withCredentials : true
       })
-     user(false)
+     onLogout()
     } catch (error) {
       console.log(error )
     }

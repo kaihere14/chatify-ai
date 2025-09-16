@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Auth = ({ onLogin }) => {
+const Auth = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
@@ -36,7 +36,7 @@ const Auth = ({ onLogin }) => {
       const data = await res.json();
 
       console.log(data);
-      onLogin(data); // pass login success back
+      onLoginSuccess(data); // pass login success back
     } catch (err) {
       console.error(err.message);
       alert("Auth failed");
