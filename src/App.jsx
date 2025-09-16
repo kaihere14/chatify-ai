@@ -9,6 +9,7 @@ function App() {
 
   const checkAuth = async () => {
     try {
+      console.log("Checking auth");
       const res = await axios.get("https://chatify-backend-eight.vercel.app/me", {
         withCredentials: true,
       });
