@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GrAd } from "react-icons/gr";
-import { GoSidebarExpand } from "react-icons/go";
+import { GoSidebarExpand, GoSidebarCollapse } from "react-icons/go";
 import { TfiWrite } from "react-icons/tfi";
 import { IoSend } from "react-icons/io5";
 import axios from 'axios';
@@ -12,6 +12,7 @@ const Forground = ({ user, onLogout }) => {
   const [loading, setLoadin] = useState(false);
   const [input, setInput] = useState('');
   const [message, setMessage] = useState([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Re-introduce state for sidebar visibility
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -57,9 +58,12 @@ const Forground = ({ user, onLogout }) => {
   return (
     <div className='w-full min-h-[100vh] bg-[#4f4f4f] flex flex-col md:flex-row'>
       {/* Sidebar */}
-      <div className="sidebar md:w-[22vw] md:min-h-screen border-r-4 w-full h-30 bg-black/30">
+      <div className={`sidebar md:w-[22vw] min-h-screen border-r-4 w-full bg-black/30 fixed md:static top-0 left-0 z-20 transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="first flex justify-between p-3">
           <GrAd className="text-white/80 text-2xl" />
+          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-white/70 text-2xl md:hidden">
+            {isSidebarOpen ? <GoSidebarCollapse /> : <GoSidebarExpand />}
+          </button>
           <GoSidebarExpand className="text-white/70 text-2xl hidden md:block" />
         </div>
 
@@ -73,7 +77,6 @@ const Forground = ({ user, onLogout }) => {
           </button>
         </div>
 
-
         <div
           onClick={logOut}
           className="nchat md:mt-10 py-3 w-full flex items-center justify-center cursor-pointer hover:bg-black/20"
@@ -86,7 +89,16 @@ const Forground = ({ user, onLogout }) => {
       </div>
 
       {/* Chat Area */}
-      <div className='left-80 w-full md:w-[78vw] h-screen md:h-[100vh] bg-black/40 overflow-x-hidden overflow-y-auto'>
+      <div className={`w-full md:w-[78vw] h-screen md:h-[100vh] bg-black/40 overflow-x-hidden overflow-y-auto ${isSidebarOpen ? 'md:ml-[22vw]' : ''}`}>
+        {/* Mobile sidebar toggle button */}
+        {!isSidebarOpen && (
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="md:hidden absolute top-3 left-3 text-white/70 text-2xl z-10"
+          >
+            <GoSidebarExpand />
+          </button>
+        )}
         <div className="messages p-5 flex flex-col space-y-2">
           {message.map((msg, index) => (
             <div
