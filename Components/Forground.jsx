@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GrAd } from "react-icons/gr";
-import { GoSidebarExpand } from "react-icons/go";
+import { GoSidebarExpand, GoSidebarCollapse } from "react-icons/go"; // Import GoSidebarCollapse
 import { TfiWrite } from "react-icons/tfi";
 import { IoSend } from "react-icons/io5";
 import axios from 'axios';
@@ -12,6 +12,7 @@ const Forground = ({ user, onLogout }) => {
   const [loading, setLoadin] = useState(false);
   const [input, setInput] = useState('');
   const [message, setMessage] = useState([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // New state for sidebar visibility
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -57,15 +58,22 @@ const Forground = ({ user, onLogout }) => {
   return (
     <div className='w-full min-h-[100vh] bg-[#4f4f4f] flex flex-col md:flex-row'>
       {/* Sidebar */}
-      <div className="sidebar md:w-[22vw] md:min-h-screen border-r-4 w-full h-30 bg-black/30">
+      <motion.div
+        initial={{ x: -200 }}
+        animate={{ x: isSidebarOpen ? 0 : -200 }}
+        transition={{ type: "spring", stiffness: 100 }}
+        className={`sidebar md:w-[22vw] min-h-screen border-r-4 w-full bg-black/30 fixed md:static top-0 left-0 z-20 ${isSidebarOpen ? 'block' : 'hidden md:block'}`}>
         <div className="first flex justify-between p-3">
           <GrAd className="text-white/80 text-2xl" />
+          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-white/70 text-2xl md:hidden">
+            {isSidebarOpen ? <GoSidebarCollapse /> : <GoSidebarExpand />}
+          </button>
           <GoSidebarExpand className="text-white/70 text-2xl hidden md:block" />
         </div>
 
         <div
           onClick={()=>setMessage([])}
-          className="nchat md:mt-10 py-3 w-full flex items-center justify-center cursor-pointer hover:bg-black/20"
+          className="nchat mt-5 py-3 w-full flex items-center justify-center cursor-pointer hover:bg-black/20"
         >
           <TfiWrite className="text-2xl text-white/30" />
           <button className="text-xl ml-3 text-white/30 cursor-pointer">
@@ -73,17 +81,16 @@ const Forground = ({ user, onLogout }) => {
           </button>
         </div>
 
-
         <div
           onClick={logOut}
-          className="nchat md:mt-10 py-3 w-full flex items-center justify-center cursor-pointer hover:bg-black/20"
+          className="nchat mt-5 py-3 w-full flex items-center justify-center cursor-pointer hover:bg-black/20"
         >
           <TfiWrite className="text-2xl text-white/30" />
           <button className="text-xl ml-3 text-white/30 cursor-pointer">
             log out
           </button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Chat Area */}
       <div className='left-80 w-full md:w-[78vw] h-screen md:h-[100vh] bg-black/40 overflow-x-hidden overflow-y-auto'>
