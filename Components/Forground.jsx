@@ -125,7 +125,7 @@ const Forground = ({ user, onLogout }) => {
                 </span>
               </div>
               <div>
-                <p className="text-white text-sm font-medium">{user.name || 'User'}</p>
+                <p className="text-white text-sm font-medium">{user.username || 'User'}</p>
                 <p className="text-slate-400 text-xs">{user.email}</p>
               </div>
             </div>
