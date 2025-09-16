@@ -20,9 +20,20 @@ function App() {
     }
   };
 
+  // Remove 'user' from dependency array to prevent infinite loop
   useEffect(() => {
     checkAuth();
-  }, [user]);
+  }, []); // Empty dependency array - only run on mount
+
+  // Handle successful login
+  const handleLoginSuccess = () => {
+    checkAuth(); // Re-check auth status after successful login
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    setUser(null); // Clear user state immediately
+  };
 
   if (loading) {
     return (
@@ -35,9 +46,9 @@ function App() {
   return (
     <div className="min-h-screen">
       {user ? (
-        <Forground user={user} onLogout={checkAuth} />
+        <Forground user={user} onLogout={handleLogout} />
       ) : (
-        <Auth onLoginSuccess={checkAuth} />
+        <Auth onLoginSuccess={handleLoginSuccess} />
       )}
     </div>
   );
