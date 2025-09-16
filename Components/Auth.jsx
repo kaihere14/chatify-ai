@@ -26,7 +26,6 @@ const Auth = ({ onLoginSuccess }) => {
       });
       
       if (res.status === 200 || res.status === 201) {
-        console.log(res.data);
         localStorage.setItem("accessToken", res.data.accessToken);
         onLoginSuccess();
       }
@@ -34,7 +33,7 @@ const Auth = ({ onLoginSuccess }) => {
       alert("Authentication failed");
     } finally {
       setIsLoading(false);
-    }œ
+    }ß
   };
 
   return (
