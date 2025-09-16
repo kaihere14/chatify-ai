@@ -22,7 +22,7 @@ function App() {
     };
 
     checkAuth();
-  }, [setUser]);
+  }, [user]);
 
   if (loading) return <div className="text-white">Checking auth...</div>;
 
