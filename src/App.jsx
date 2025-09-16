@@ -1,14 +1,40 @@
-import React from 'react'
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Auth from "../Components/Auth.jsx";
+import Forground from "../Components/Forground.jsx";
 
-import Forground from '../Components/Forground'
+function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-const App = () => {
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await axios.get("http://localhost:3000/me", {
+          withCredentials: true, // send cookies
+        });
+        setUser(res.data.user); // user comes from backend
+      } catch (err) {
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [user]);
+
+  if (loading) return <div className="text-white">Checking auth...</div>;
+
   return (
-    <div>
-      
-      <Forground/>
-    </div>
-  )
+    <>
+      {user ? (
+        <Forground user={(user)=>setUser(user)} />
+      ) : (
+        <Auth onLogin={(data) => setUser(data.user)} />
+      )}
+    </>
+  );
 }
 
-export default App
+export default App;
