@@ -26,7 +26,7 @@ const Auth = ({ onLoginSuccess }) => {
       });
       
       if (res.status === 200 || res.status === 201) {
-        localStorage.setItem("accessToken", res.data.accessToken);
+        localStorage.setItem("accessToken", res.data.data.accessToken);
         onLoginSuccess();
       }
     } catch (err) {
