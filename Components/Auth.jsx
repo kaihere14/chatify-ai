@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
 
 const Auth = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState("");
@@ -7,6 +8,18 @@ const Auth = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const notify = () =>toast.success('🦄 Wow so easy!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+     });
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,8 +39,13 @@ const Auth = ({ onLoginSuccess }) => {
       });
       
       if (res.status === 200 || res.status === 201) {
-        localStorage.setItem("accessToken", res.data.data.accessToken);
-        onLoginSuccess();
+        if (isLogin) {
+          localStorage.setItem("accessToken", res.data.data.accessToken);
+          onLoginSuccess();
+        } else {
+          <ToastContainer/>
+          setIsLogin(true); // Switch to login form
+        }
       }
     } catch (err) {
       alert("Authentication failed");
