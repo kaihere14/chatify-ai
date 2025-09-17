@@ -44,7 +44,6 @@ const Auth = ({ onLoginSuccess }) => {
           onLoginSuccess();
         } else {
           notify(),
-          <ToastContainer/>
           setIsLogin(true); // Switch to login form
         }
       }
@@ -57,6 +56,7 @@ const Auth = ({ onLoginSuccess }) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-900 p-4 relative overflow-hidden">
+      <ToastContainer/>
       {/* Animated background elements */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-10 left-10 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
