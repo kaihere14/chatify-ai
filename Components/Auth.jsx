@@ -43,6 +43,7 @@ const Auth = ({ onLoginSuccess }) => {
           localStorage.setItem("accessToken", res.data.data.accessToken);
           onLoginSuccess();
         } else {
+          notify(),
           <ToastContainer/>
           setIsLogin(true); // Switch to login form
         }
