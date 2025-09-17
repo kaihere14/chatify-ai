@@ -14,6 +14,7 @@ const Forground = ({ user, onLogout }) => {
   const [input, setInput] = useState('');
   const [message, setMessage] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isLogingOut ,setLogingOut] = useState(false)
   const bottomRef = useRef(null);
 
   // Scroll to bottom whenever messages update
@@ -61,6 +62,7 @@ const Forground = ({ user, onLogout }) => {
 
   // Logout function
   const logOut = async () => {
+    setLogingOut(true)
     try {
       await axios.post(
         "https://chatify-backend-eight.vercel.app/logout",
@@ -70,14 +72,21 @@ const Forground = ({ user, onLogout }) => {
         }
       );
       onLogout();
+      setLogingOut(false)
       localStorage.removeItem("accessToken");
     } catch (error) {
+      setLogingOut(false)
       console.error(error);
     }
   };
 
   return (
     <div className='w-full min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 flex flex-col md:flex-row'>
+      {isLogingOut && 
+      (<div className='absolute top-0 w-full h-screen flex justify-center items-center'>
+        <h1 className='text-3xl text-white'>Logging out</h1>
+      </div>)
+      }
       {/* Overlay for mobile */}
       {isSidebarOpen && (
         <div 
