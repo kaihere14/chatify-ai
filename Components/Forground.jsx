@@ -83,8 +83,8 @@ const Forground = ({ user, onLogout }) => {
   return (
     <div className='w-full min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 flex flex-col md:flex-row'>
       {isLogingOut && 
-      (<div className='absolute top-0 w-full h-screen flex justify-center items-center bg-white/10 blur-lg'>
-        <h1 className='text-3xl text-white'>Logging out</h1>
+      (<div className='absolute top-0 w-full h-screen flex justify-center items-center bg-white/10 blur-lg z-[999]'>
+        <h1 className='text-lg text-white font-solid'>Logging out...</h1>
       </div>)
       }
       {/* Overlay for mobile */}
