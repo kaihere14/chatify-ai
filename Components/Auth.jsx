@@ -8,7 +8,7 @@ const Auth = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const notify = () =>toast.success('🦄 Wow so easy!', {
+  const notify = () =>toast.success('Account created successfully', {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
