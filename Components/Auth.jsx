@@ -78,7 +78,7 @@ const Auth = ({ onLoginSuccess }) => {
       setIsLoading(true);
       await axios.post("https://chatify-backend-eight.vercel.app/otp", { email });
       setIsOtpSent(true);
-      setOtpTimer(30); // Start 30-second timer
+      setOtpTimer(60); // Start 60-second timer
       toast.success("OTP sent to your email!", { position: "top-right" });
     } catch (error) {
       console.error("Error sending OTP:", error);
