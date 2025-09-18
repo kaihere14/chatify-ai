@@ -18,14 +18,18 @@ function App() {
     } catch (err) {
       if(err.status == 406){
         console.log('r runned')
-        const rtoken = localStorage.getItem("accessToken");
+        try{
+        const rtoken = localStorage.getItem("refreshToken");
         const res = await axios.get("https://chatify-backend-eight.vercel.app/refresh", {
           headers: { Authorization: `Bearer ${rtoken}` }
         });
         localStorage.setItem("accessToken", res.data.data.accessToken);
         checkAuth()
-      }else{
-        setUser(null);
+      }catch(err){
+  
+          setUser(null);
+        
+      }
       }
       
     } finally {
