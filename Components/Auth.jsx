@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -8,6 +8,21 @@ const Auth = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [otpInput, setOtpInput] = useState(""); // New state for OTP input
+  const [otpTimer, setOtpTimer] = useState(0); // New state for OTP timer
+  const [isOtpSent, setIsOtpSent] = useState(false); // New state to track if OTP is sent
+
+  // useEffect for managing the OTP timer
+  useEffect(() => {
+    let timerId;
+    if (otpTimer > 0) {
+      timerId = setTimeout(() => {
+        setOtpTimer(prev => prev - 1);
+      }, 1000);
+    }
+    return () => clearTimeout(timerId);
+  }, [otpTimer]);
+
   const notify = () =>toast.success('Account created successfully', {
           position: "top-right",
           autoClose: 5000,
@@ -30,9 +45,12 @@ const Auth = ({ onLoginSuccess }) => {
         ? "https://chatify-backend-eight.vercel.app/login"
         : "https://chatify-backend-eight.vercel.app/register";
 
-      const payload = isLogin
-        ? { username, password }
-        : { username, email, password };
+      let payload;
+      if (isLogin) {
+        payload = { username, password };
+      } else {
+        payload = { username, email, password, otp: otpInput }; // Include OTP for registration
+      }
 
       const res = await axios.post(url, payload, {
         withCredentials: true,
@@ -49,6 +67,22 @@ const Auth = ({ onLoginSuccess }) => {
       }
     } catch (err) {
       alert("Authentication failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Function to handle getting the OTP
+  const handleGetOtp = async () => {
+    try {
+      setIsLoading(true);
+      await axios.post("https://chatify-backend-eight.vercel.app/otp", { email });
+      setIsOtpSent(true);
+      setOtpTimer(30); // Start 30-second timer
+      toast.success("OTP sent to your email!", { position: "top-right" });
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      toast.error(error.response?.data?.message || "Failed to send OTP.", { position: "top-right" });
     } finally {
       setIsLoading(false);
     }
@@ -111,6 +145,32 @@ const Auth = ({ onLoginSuccess }) => {
                 />
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
               </div>
+            )}
+
+            {!isLogin && isOtpSent && (
+              <div className="relative group">
+                <input
+                  type="text"
+                  placeholder="OTP"
+                  className="w-full px-4 py-4 bg-gray-800/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 group-hover:border-gray-500/70"
+                  value={otpInput}
+                  onChange={(e) => setOtpInput(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
+              </div>
+            )}
+
+            {!isLogin && (
+              <button
+                type="button"
+                onClick={handleGetOtp}
+                disabled={isLoading || otpTimer > 0 || !email}
+                className="w-full py-4 px-4 bg-gradient-to-r from-green-500 to-teal-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-teal-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
+              >
+                {otpTimer > 0 ? `Resend OTP in ${otpTimer}s` : "Get OTP"}
+              </button>
             )}
 
             <div className="relative group">
