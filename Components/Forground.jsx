@@ -116,7 +116,10 @@ const Forground = ({ user, onLogout }) => {
         {/* New Chat Button */}
         <div className="p-4">
           <button
-            onClick={() => setMessage([])}
+            onClick={() => {
+              setMessage([]),
+              setIsSidebarOpen(false)
+            }}
             className="w-full flex items-center justify-center space-x-3 py-4 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium transition-all duration-200 transform hover:scale-105 shadow-lg"
           >
             <HiSparkles className="text-xl" />
