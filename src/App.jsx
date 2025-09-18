@@ -10,13 +10,23 @@ function App() {
   const checkAuth = async () => {
     try {
       console.log("Checking auth");
-      const token = localStorage.getItem("accessToken");
+      const atoken = localStorage.getItem("accessToken");
       const res = await axios.get("https://chatify-backend-eight.vercel.app/me", {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${atoken}` }
       });
       setUser(res.data.user);
     } catch (err) {
-      setUser(null);
+      if(err.status == 406){
+        const rtoken = localStorage.getItem("accessToken");
+        const res = await axios.get("https://chatify-backend-eight.vercel.app/refresh", {
+          headers: { Authorization: `Bearer ${rtoken}` }
+        });
+        localStorage.setItem("accessToken", res.data.data.accessToken);
+        checkAuth()
+      }else{
+        setUser(null);
+      }
+      
     } finally {
       setLoading(false);
     }
