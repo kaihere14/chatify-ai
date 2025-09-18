@@ -24,6 +24,7 @@ function App() {
             const res = await axios.get("https://chatify-backend-eight.vercel.app/refresh", {
               headers: { Authorization: `Bearer ${rtoken}` }
             });
+            console.log("afterr:",res)
             localStorage.setItem("accessToken", res.data.data.accessToken);
             checkAuth()
           }catch(err){
