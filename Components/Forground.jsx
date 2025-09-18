@@ -96,9 +96,9 @@ const Forground = ({ user, onLogout }) => {
       )}
 
       {/* Sidebar */}
-      <div className={`sidebar rounded-2xl w-full md:w-80 min-h-screen bg-gradient-to-b from-slate-800 to-slate-900 border-r border-slate-700/50 backdrop-blur-sm fixed md:static top-0 left-0 z-20 transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} shadow-2xl`}>
+      <div className={`sidebar  w-full md:w-80 min-h-screen bg-gradient-to-b from-slate-800 to-slate-900 border-r border-slate-700/50 backdrop-blur-sm fixed md:static top-0 left-0 z-20 transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} shadow-2xl`}>
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
+        <div className="flex rounded-2xl items-center justify-between p-6 border-b border-slate-700/50">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
               <GrAd className="text-white text-xl" />
