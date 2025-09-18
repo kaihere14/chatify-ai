@@ -169,7 +169,7 @@ const Forground = ({ user, onLogout }) => {
       {/* Chat Area */}
       <div className="flex-1 flex flex-col h-screen bg-slate-900/50">
         {/* Mobile Header */}
-        <div className="md:hidden sticky top-0 z-10 flex items-center justify-between p-4 bg-slate-800/50 border-b border-slate-700/50 rounded-2xl">
+        <div className="md:hidden sticky top-0 z-10 flex items-center justify-between p-4 bg-slate-800/50 border-b border-slate-700/50 rounded-b-2xl">
           <button
             onClick={() => setIsSidebarOpen(true)}
             className="text-slate-400 hover:text-white text-2xl transition-colors p-1"
