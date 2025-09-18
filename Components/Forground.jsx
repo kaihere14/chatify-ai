@@ -98,7 +98,7 @@ const Forground = ({ user, onLogout }) => {
       {/* Sidebar */}
       <div className={`sidebar  w-full md:w-80 min-h-screen bg-gradient-to-b from-slate-800 to-slate-900 border-r border-slate-700/50 backdrop-blur-sm fixed md:static top-0 left-0 z-20 transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} shadow-2xl`}>
         {/* Header */}
-        <div className="flex rounded-2xl items-center justify-between p-6 border-b border-slate-700/50">
+        <div className="flex  items-center justify-between p-6 border-b border-slate-700/50">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
               <GrAd className="text-white text-xl" />
@@ -169,7 +169,7 @@ const Forground = ({ user, onLogout }) => {
       {/* Chat Area */}
       <div className="flex-1 flex flex-col h-screen bg-slate-900/50">
         {/* Mobile Header */}
-        <div className="md:hidden sticky top-0 z-10 flex items-center justify-between p-4 bg-slate-800/50 border-b border-slate-700/50">
+        <div className="md:hidden sticky top-0 z-10 flex items-center justify-between p-4 bg-slate-800/50 border-b border-slate-700/50 rounded-2xl">
           <button
             onClick={() => setIsSidebarOpen(true)}
             className="text-slate-400 hover:text-white text-2xl transition-colors p-1"
