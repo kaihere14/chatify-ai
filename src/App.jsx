@@ -18,20 +18,18 @@ function App() {
     } catch (err) {
       if(err.status == 406){
         console.log('r runned')
-        try{
-        const rtoken = localStorage.getItem("refreshToken");
-        const res = await axios.get("https://chatify-backend-eight.vercel.app/refresh", {
-          headers: { Authorization: `Bearer ${rtoken}` }
-        });
-        localStorage.setItem("accessToken", res.data.data.accessToken);
-        checkAuth()
-      }catch(err){
-  
-          setUser(null);
-        
+            try{
+            const rtoken = localStorage.getItem("refreshToken");
+            console.log(rtoken)
+            const res = await axios.get("https://chatify-backend-eight.vercel.app/refresh", {
+              headers: { Authorization: `Bearer ${rtoken}` }
+            });
+            localStorage.setItem("accessToken", res.data.data.accessToken);
+            checkAuth()
+          }catch(err){
+            setUser(null);
+          }
       }
-      }
-      
     } finally {
       setLoading(false);
     }
