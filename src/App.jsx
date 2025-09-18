@@ -17,7 +17,10 @@ function App() {
       setUser(res.data.user);
     } catch (err) {
       setUser(null);
-    } finally {
+    } finally {kklh
+
+
+      
       setLoading(false);
     }
   };

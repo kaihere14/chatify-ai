@@ -59,6 +59,7 @@ const Auth = ({ onLoginSuccess }) => {
       if (res.status === 200 || res.status === 201) {
         if (isLogin) {
           localStorage.setItem("accessToken", res.data.data.accessToken);
+          localStorage.setItem("accessToken", res.data.data.refreshToken);
           onLoginSuccess();
         } else {
           notify(),
