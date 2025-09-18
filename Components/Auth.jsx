@@ -66,7 +66,8 @@ const Auth = ({ onLoginSuccess }) => {
         }
       }
     } catch (err) {
-      alert("Authentication failed");
+      console.error("Authentication error:", err);
+      toast.error(err.response?.data?.message || "Authentication failed!", { position: "top-right" });
     } finally {
       setIsLoading(false);
     }
