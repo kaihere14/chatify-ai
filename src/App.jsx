@@ -17,6 +17,7 @@ function App() {
       setUser(res.data.user);
     } catch (err) {
       if(err.status == 406){
+        console.log('r runned')
         const rtoken = localStorage.getItem("accessToken");
         const res = await axios.get("https://chatify-backend-eight.vercel.app/refresh", {
           headers: { Authorization: `Bearer ${rtoken}` }
