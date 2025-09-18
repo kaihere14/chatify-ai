@@ -96,7 +96,7 @@ const Forground = ({ user, onLogout }) => {
       )}
 
       {/* Sidebar */}
-      <div className={`sidebar w-full md:w-80 min-h-screen bg-gradient-to-b from-slate-800 to-slate-900 border-r border-slate-700/50 backdrop-blur-sm fixed md:static top-0 left-0 z-20 transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} shadow-2xl`}>
+      <div className={`sidebar rounded-2xl w-full md:w-80 min-h-screen bg-gradient-to-b from-slate-800 to-slate-900 border-r border-slate-700/50 backdrop-blur-sm fixed md:static top-0 left-0 z-20 transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} shadow-2xl`}>
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
           <div className="flex items-center space-x-3">
@@ -182,10 +182,10 @@ const Forground = ({ user, onLogout }) => {
             </div>
             <span className="text-white font-semibold">Chatify</span>
           </div>
-          <div className="w-8"></div> {/* Spacer for alignment */}
+          <div className="w-8"></div> {/* spacer for alignment */}
         </div>
 
-        {/* Messages Area */}
+        {/* Meessage Arra for the user to work with ... */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
           {message.length === 0 && (
             <div className="flex flex-col items-center justify-center h-full text-center">
