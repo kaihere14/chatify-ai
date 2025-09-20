@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Auth from "../Components/Auth.jsx";
 import Forground from "../Components/Forground.jsx";
+import { ToastContainer, toast } from 'react-toastify'; // Import ToastContainer and toast
 
 function App() {
   const [user, setUser] = useState(null);
@@ -61,6 +62,7 @@ function App() {
 
   return (
     <div className="min-h-screen">
+      <ToastContainer /> {/* ToastContainer placed here */}
       {user ? (
         <Forground user={user} onLogout={handleLogout} />
       ) : (
