@@ -315,7 +315,7 @@ const Forground = ({ user, onLogout }) => {
                   disabled={loading}
                   className="absolute cursor-pointer right-4 bottom-2 md:bottom-2.5 p-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full transition-all duration-200 transform hover:scale-105 shadow-lg shadow-blue-500/50"
                 >
-                  <HiSparkles className="text-lg" />
+                  <HiSparkles className="text-lg rounded-full" />
                 </button>
               </div>
               <button 
