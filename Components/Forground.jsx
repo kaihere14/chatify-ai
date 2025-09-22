@@ -8,6 +8,8 @@ import { HiSparkles } from "react-icons/hi";
 import axios from 'axios';
 import { ThreeDot } from "react-loading-indicators";
 import ReactMarkdown from "react-markdown";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Forground = ({ user, onLogout }) => {
   const [loading, setLoading] = useState(false);
@@ -63,7 +65,7 @@ const Forground = ({ user, onLogout }) => {
   // Handle redefine action
   const handleRedefine = async () => {
     const data = {input}
-    setLoading(true);
+    const toastId = toast.info("Redefining your input...");
     try {
       const response = await axios.post(
         "https://chatify-backend-eight.vercel.app/redefine",data, // Use /redefine endpoint
@@ -74,11 +76,12 @@ const Forground = ({ user, onLogout }) => {
         }
       );
       setInput(response.data.text);
+      toast.dismiss(toastId); // Dismiss the info toast
+      toast.success("Input redefined successfully!", { autoClose: 1500 });
     } catch (error) {
       console.error("Error redefining input:", error);
+      toast.error("Failed to redefine input.", { autoClose: 1500 });
       // Optionally, set an error message to the input field or display it elsewhere
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -250,7 +253,7 @@ const Forground = ({ user, onLogout }) => {
               className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"} mb-4`}
             >
               <div
-                className={`max-w-[85%] md:max-w-[70%] px-4 py-3 rounded-2xl ${
+                className={`max-w-[85%] md:max-w-[70%] ${msg.sender === "user" ? "pl-4 pr-2" : "px-4"} py-3 rounded-2xl ${
                   msg.sender === "user" 
                     ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg" 
                     : "bg-slate-800/70 text-slate-100 border border-slate-700/50 shadow-md"
@@ -303,7 +306,7 @@ const Forground = ({ user, onLogout }) => {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Type your message here..."
-                  className="w-full px-4 py-3 md:py-4 pr-[4rem] rounded-2xl bg-slate-800/80 border border-slate-600/50 text-white placeholder-slate-400 outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 backdrop-blur-sm resize-none"
+                  className="w-full px-4 py-3 md:py-4 pr-16 rounded-2xl bg-slate-800/80 border border-slate-600/50 text-white placeholder-slate-400 outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 backdrop-blur-sm resize-none"
                   disabled={loading}
                 />
                 <button
@@ -312,7 +315,7 @@ const Forground = ({ user, onLogout }) => {
                   disabled={loading}
                   className="absolute cursor-pointer right-4 bottom-2 md:bottom-2.5 p-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full transition-all duration-200 transform hover:scale-105 shadow-lg shadow-blue-500/50"
                 >
-                  <TfiWrite className="text-lg" />
+                  <HiSparkles className="text-lg" />
                 </button>
               </div>
               <button 
@@ -326,6 +329,7 @@ const Forground = ({ user, onLogout }) => {
           </form>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };
