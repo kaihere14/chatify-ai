@@ -60,6 +60,28 @@ const Forground = ({ user, onLogout }) => {
     }
   };
 
+  // Handle redefine action
+  const handleRedefine = async () => {
+    const data = {input}
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "https://chatify-backend-eight.vercel.app/redefine",data, // Use /redefine endpoint
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setInput(response.data.text);
+    } catch (error) {
+      console.error("Error redefining input:", error);
+      // Optionally, set an error message to the input field or display it elsewhere
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Logout function
   const logOut = async () => {
     setLogingOut(true)
@@ -281,9 +303,17 @@ const Forground = ({ user, onLogout }) => {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Type your message here..."
-                  className="w-full px-4 py-3 md:py-4 pr-12 rounded-2xl bg-slate-800/80 border border-slate-600/50 text-white placeholder-slate-400 outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 backdrop-blur-sm resize-none"
+                  className="w-full px-4 py-3 md:py-4 pr-[4rem] rounded-2xl bg-slate-800/80 border border-slate-600/50 text-white placeholder-slate-400 outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 backdrop-blur-sm resize-none"
                   disabled={loading}
                 />
+                <button
+                  type="button"
+                  onClick={handleRedefine}
+                  disabled={loading}
+                  className="absolute cursor-pointer right-4 bottom-2 md:bottom-2.5 p-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full transition-all duration-200 transform hover:scale-105 shadow-lg shadow-blue-500/50"
+                >
+                  <TfiWrite className="text-lg" />
+                </button>
               </div>
               <button 
                 type="submit"
