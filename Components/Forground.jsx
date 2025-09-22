@@ -17,6 +17,7 @@ const Forground = ({ user, onLogout }) => {
   const [message, setMessage] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLogingOut ,setLogingOut] = useState(false)
+  const [isRedefineLoading, setIsRedefineLoading] = useState(false); // New state for redefine button loading
   const bottomRef = useRef(null);
 
   // Scroll to bottom whenever messages update
@@ -66,6 +67,7 @@ const Forground = ({ user, onLogout }) => {
   const handleRedefine = async () => {
     const data = {input}
     const toastId = toast.info("Redefining your input...");
+    setIsRedefineLoading(true); // Set loading to true
     try {
       const response = await axios.post(
         "https://chatify-backend-eight.vercel.app/redefine",data, // Use /redefine endpoint
@@ -82,6 +84,8 @@ const Forground = ({ user, onLogout }) => {
       console.error("Error redefining input:", error);
       toast.error("Failed to redefine input.", { autoClose: 1500 });
       // Optionally, set an error message to the input field or display it elsewhere
+    } finally {
+      setIsRedefineLoading(false); // Set loading to false
     }
   };
 
@@ -312,10 +316,10 @@ const Forground = ({ user, onLogout }) => {
                 <button
                   type="button"
                   onClick={handleRedefine}
-                  disabled={loading}
+                  disabled={loading || isRedefineLoading} // Disable button when redefining
                   className="absolute cursor-pointer right-4 bottom-2 md:bottom-2.5 p-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full transition-all duration-200 transform hover:scale-105 shadow-lg shadow-blue-500/50"
                 >
-                  <HiSparkles className="text-lg rounded-full" />
+                  <HiSparkles className={`text-lg rounded-full ${isRedefineLoading ? 'animate-spin' : ''}`} />
                 </button>
               </div>
               <button 
