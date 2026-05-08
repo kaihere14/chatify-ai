@@ -9,15 +9,14 @@
 
 ## 📖 Overview  
 
-Chatify AI is a single‑page React application that:
+**Chatify AI** is a sleek, React-based single-page application that provides a modern interface for interacting with AI services. It connects to the Chatify backend API to deliver a real-time, secure, and animated chat experience.
 
-* Authenticates users via JWT access/refresh tokens stored in `localStorage`.  
-* Shows a login/register flow when the user is not authenticated.
-* Provides a dedicated **Forgot Password** recovery interface.  
-* Renders the main chat UI (the **Forground** component) once the user is logged in.  
-* Uses **TailwindCSS** for styling, **Framer Motion** for animations, **React‑Markdown** for rich message rendering, and **React‑Toastify** for user notifications.
+*   **Authentication**: Implements JWT access/refresh token logic with secure `localStorage` persistence.
+*   **Account Management**: Includes a dedicated **Forgot Password** recovery flow alongside standard login/registration.
+*   **Core Interface**: Renders the main **Forground** chat component once a user is authenticated.
+*   **Modern Styling**: Leverages **TailwindCSS 4** for layout, **Framer Motion** for animations, and **React-Markdown** for rich AI response rendering.
 
-Target audience: developers who want a ready‑to‑run front‑end for an AI chat service, or anyone looking for a clean, modern UI to pair with the official Chatify backend.
+Target audience: Developers looking for a production-ready frontend for AI chat services or a clean UI to pair with the Chatify backend.
 
 Current version: `0.0.0` (development).  
 
@@ -26,30 +25,30 @@ Current version: `0.0.0` (development).
 
 | Feature | Description | Status |
 |---------|-------------|--------|
-| **JWT Authentication** | Automatic token refresh, secure storage in `localStorage`. | ✅ Stable |
+| **JWT Authentication** | Automatic token refresh and secure storage in `localStorage`. | ✅ Stable |
 | **Password Recovery** | Integrated `ForgotPassword` component for account recovery. | ✅ Stable |
-| **Responsive UI** | TailwindCSS + Flexbox ensures mobile‑first design. | ✅ Stable |
-| **Animated Transitions** | Framer Motion adds smooth entry/exit animations. | ✅ Stable |
-| **Markdown Support** | `react-markdown` renders rich message content. | ✅ Stable |
-| **Toast Notifications** | `react-toastify` provides non‑intrusive feedback. | ✅ Stable |
-| **Error Handling** | Graceful fallback on token expiry, auto‑logout. | ✅ Stable |
-| **Modular Architecture** | Separate `Auth`, `ForgotPassword`, and `Forground` components. | ✅ Stable |
-| **Dark Mode Ready** | Default dark background, easy to toggle. | ✅ Stable |
+| **Responsive UI** | Mobile-first design powered by TailwindCSS 4. | ✅ Stable |
+| **Animated Transitions** | Smooth entry/exit animations using Framer Motion. | ✅ Stable |
+| **Markdown Support** | `react-markdown` renders rich message content and code blocks. | ✅ Stable |
+| **Toast Notifications** | Non-intrusive feedback via `react-toastify`. | ✅ Stable |
+| **Error Handling** | Graceful fallback on token expiry with auto-logout logic. | ✅ Stable |
+| **Modular Architecture** | Decoupled `Auth`, `ForgotPassword`, and `Forground` components. | ✅ Stable |
+| **Dark Mode Ready** | Default dark background optimized for chat readability. | ✅ Stable |
 
 ---
 ## 🛠️ Tech Stack  
 
 | Category | Library / Tool | Reason |
 |----------|----------------|--------|
-| **Framework** | React 19.1.1 | Modern UI library with hooks. |
-| **Bundler / Dev Server** | Vite 7.1.2 | Lightning‑fast HMR and build. |
-| **Styling** | TailwindCSS 4.1.13 + `@tailwindcss/typography` | Utility‑first CSS, ready for dark mode. |
-| **Animations** | Framer Motion 12.23.12 | Declarative animation API. |
-| **HTTP Client** | Axios 1.7.2 | Promise‑based API calls. |
-| **Icons** | react‑icons 5.2.1 | SVG icon set. |
-| **Markdown** | react‑markdown 10.1.0 | Render markdown in chat messages. |
-| **Notifications** | react‑toastify 11.0.5 | Toast UI for success/error feedback. |
-| **Linting** | ESLint 9.33.0 | Code quality enforcement. |
+| **Framework** | React 19.1.1 | Modern UI library with hooks. |
+| **Bundler** | Vite 7.1.2 | Lightning-fast HMR and build performance. |
+| **Styling** | TailwindCSS 4.1.13 + `@tailwindcss/typography` | Utility-first CSS, ready for dark mode. |
+| **Animations** | Framer Motion 12.23.12 | Declarative animation API for fluid UI. |
+| **HTTP Client** | Axios 1.7.2 | Promise-based API calls for backend sync. |
+| **Icons** | react-icons 5.2.1 | Comprehensive SVG icon set. |
+| **Markdown** | react-markdown 10.1.0 | Renders markdown in chat messages. |
+| **Notifications** | react-toastify 11.0.5 | Toast UI for success/error feedback. |
+| **Linting** | ESLint 9.33.0 | Code quality and standards enforcement. |
 
 ---
 ## 🏗️ Architecture  
@@ -143,7 +142,7 @@ const checkAuth = async () => {
     });
     setUser(res.data.user);
   } catch (err) {
-    // If access token expired, try refresh token
+    // If access token expired (406), try refresh token
     if (err.response?.status === 406) {
       const rtoken = localStorage.getItem("refreshToken");
       const refreshRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/refresh`, {
@@ -162,9 +161,9 @@ const checkAuth = async () => {
 
 ### Basic UI flow  
 
-1. **Loading** – While `checkAuth` runs, a centered “Loading…” indicator is shown.  
-2. **Unauthenticated** – `Auth` component renders a login form. Successful login triggers `handleLoginSuccess`, which re‑runs `checkAuth`.  
-3. **Authenticated** – `Forground` receives the `user` object and a logout callback.  
+1.  **Loading** – A centered loading indicator is shown while `checkAuth` validates tokens on mount.
+2.  **Unauthenticated** – The `Auth` component handles login/registration. Successful login triggers `handleLoginSuccess`, which re-runs the authentication check.
+3.  **Authenticated** – The `Forground` component is rendered, receiving the `user` object and providing the main chat interface.
 
 ### Toast notifications  
 
@@ -175,7 +174,7 @@ toast.success("Logged in successfully!");
 toast.error("Invalid credentials");
 
 
-All toasts are rendered via the `<ToastContainer />` placed at the top of `App.jsx`.
+All notifications are rendered via the `<ToastContainer />` located at the top level of `App.jsx`.
 
 ---
 ## Development  
